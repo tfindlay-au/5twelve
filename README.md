@@ -17,5 +17,3 @@ This board uses the minimum components and tried to standardise on 0603 packages
 
 ### Safety
 The design uses a simple Shottky diode to protect the DC-DC converter
-
-The Feedback loop (U1, pin2) may not need to be connected as this is a fixed voltage output.
