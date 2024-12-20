@@ -1,0 +1,33 @@
+stages:
+  - fetch-version
+  - gen_fab
+
+generate-version:
+  stage: fetch-version
+  except:
+    refs:
+      - main
+      - /^(([0-9]+)\.)?([0-9]+)\.x/ # This matches maintenance branches
+      - /^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/ # This matches pre-releases
+  script:
+    - echo build-$CI_PIPELINE_ID > VERSION.txt
+  artifacts:
+    paths:
+      - VERSION.txt
+
+pcb_outputs:
+  image: ghcr.io/inti-cmnb/kicad8_auto:1.8.1
+  stage: gen_fab
+  script:
+    - "[ -f *.kicad_pcb ] && kibot -c output.kibot.yaml"
+  only:
+    refs:
+      - main
+      # This matches maintenance branches
+      - /^(([0-9]+)\.)?([0-9]+)\.x/
+      # This matches pre-releases
+      - /^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+  artifacts:
+    when: always
+    paths:
+      - outputs/

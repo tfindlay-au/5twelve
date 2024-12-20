@@ -1,0 +1,17 @@
+* SPICE model for VLMW1300-GS08 LED
+* Based on Vishay VLMW1300-GS08 datasheet
+.SUBCKT VLMW1300-GS08 A K
+D1 A K LED_MODEL
+R1 A K 1MEG ; Leakage resistance
+C1 A K 5p ; Parasitic capacitance
+
+* LED diode model
+.MODEL LED_MODEL D (
++ IS=1e-14          ; Saturation current (derived for typical forward voltage)
++ N=2               ; Emission coefficient
++ BV=5              ; Reverse breakdown voltage
++ IBV=10u           ; Reverse leakage current
++ TT=0              ; Transit time (assumed negligible)
++ )
+
+.ENDS VLMW1300-GS08

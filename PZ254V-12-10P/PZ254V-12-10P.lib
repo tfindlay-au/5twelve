@@ -1,0 +1,15 @@
+* SPICE model for J2 (10-pin header)
+* Pins: 2=12V, 1=GND, 9=GND, others are not connected
+.SUBCKT J2 1 2 3 4 5 6 7 8 9
+
+* Define the connections for pins
+V2 2 GND DC 12   ; Pin 1 is 12V
+R2 2 GND 1MEG    ; Optional leakage resistance for simulation realism
+R1 1 GND 0.001   ; Pin 1 connected to ground with a near-zero resistance
+R9 9 GND 0.001   ; Pin 9 connected to ground with a near-zero resistance
+
+* Other pins (2 to 8) are unconnected in this example
+* Add parasitics (if needed):
+* Cparasitic1 1 9 1p ; Example parasitic capacitance between 12V and GND
+
+.ENDS J2

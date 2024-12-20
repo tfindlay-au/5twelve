@@ -1,0 +1,51 @@
+* SPICE Model for PAM2423AECADJR
+.SUBCKT PAM2423AECADJR IN OUT FB SS COMP EN GND
+* IN   - Input voltage
+* OUT  - Output voltage
+* FB   - Feedback pin
+* SS   - Soft-start pin
+* COMP - Compensation pin
+* EN   - Enable pin
+* GND  - Ground
+
+* INPUT VOLTAGE REGULATION
+VUVLO UVLO GND DC 2.5          ; Under-voltage lockout threshold
+
+* SOFT-START CIRCUIT 		   ; Soft-Start Pin Bias Current Vss = 1.2V
+I_SS SS GND 4.5uA              ; Soft-start current source
+C_SS SS GND 10nF               ; External soft-start capacitor (adjustable)
+
+* PWM OSCILLATOR
+VOSC OSC GND SIN(0 1 520k)     ; 520 kHz oscillator
+R_OSC OSC GND 1MEG             ; Oscillator equivalent resistance
+
+* ERROR AMPLIFIER
+EERR COMP GND (OUT FB) 1.262   ; Error amplifier for feedback regulation
+RERR COMP GND 1MEG             ; High resistance at COMP pin
+
+* POWER STAGE (PMOS TRANSISTOR)
+M1 SW IN GND GND PMOS_MODEL    ; depletion mode N-channel switching transistor, should be NMOS ? no PCHAN parameter.
+.MODEL PMOS_MODEL PMOS(VTO=-1 KP=0.5) ; Zero-bias threshold voltage (VTO) + Transconductance parameter (KP)
+
+* INDUCTOR
+L1 SW OUT 6.8uH                ; Per example 
+
+* RECTIFIER DIODE
+D1 OUT SW SCHOTTKY_MODEL       ; Schottky diode
+.MODEL SCHOTTKY_MODEL D(IS=1e-15 N=1.2)
+
+* OUTPUT CAPACITOR WITH ESR MODELED EXPLICITLY
+COUT OUT Midpoint 100uF       ; Output capacitor
+R_ESR Midpoint GND 0.05       ; ESR modeled as separate resistor
+
+* OVERVOLTAGE PROTECTION
+V_OVP_REF OVP_REF GND DC 1.4513   ; OVP threshold at 115% of FB
+E_OVP_CTRL OVP_CTRL GND VALUE { V(FB) - V(OVP_REF) } ; Comparator output
+S_OVP OVP GND OVP_CTRL GND VSWITCH_MODEL
+.MODEL VSWITCH_MODEL SW(RON=0.01 ROFF=1MEG)  ; Removed  VON=0.001 VOFF=0 as it was ignored anyway
+
+* ENABLE PIN (EN)
+R_EN EN GND 1MEG              ; Pull-down for EN pin
+V_EN ENABLE GND DC 1.4        ; Logic high threshold for enable 1.4V Logic low 0.4V
+
+.ENDS PAM2423AECADJR
